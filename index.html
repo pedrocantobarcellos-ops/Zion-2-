@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#06131c"/>
+<link rel="manifest" href="manifest.webmanifest"/>
+<link rel="icon" href="icons/icon-192.png"/>
+<title>ZION Local</title>
+<style>
+:root{--bg:#02070c;--panel:#071722;--cyan:#1be7ff;--text:#eafcff;--muted:#8fb7c0;--good:#6ef2b4;--warn:#ffd166;--bad:#ff6b6b}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:radial-gradient(circle at 50% 8%,#0b2734 0%,#041018 35%,#02070c 75%);color:var(--text)}
+.app{max-width:760px;margin:auto;padding:env(safe-area-inset-top) 16px calc(24px + env(safe-area-inset-bottom))}header{display:flex;justify-content:space-between;align-items:center;padding:18px 4px 4px}.brand{font-weight:950;letter-spacing:.28em;text-shadow:0 0 18px #1be7ff99}.badge{font-size:.68rem;border:1px solid #1be7ff55;border-radius:999px;padding:6px 9px;color:var(--good);background:#06202a}.hero{text-align:center;margin-top:18px}.ring{width:168px;height:168px;margin:auto;display:grid;place-items:center;border-radius:50%;position:relative;background:radial-gradient(circle,#102d3a 0 39%,#07151d 40% 54%,#0dbcd630 55%);border:1px solid #1be7ff77;box-shadow:0 0 44px #1be7ff22,inset 0 0 40px #1be7ff17}.ring:before,.ring:after{content:"";position:absolute;border-radius:50%;border:1px dashed #1be7ff88}.ring:before{inset:13px;animation:spin 18s linear infinite}.ring:after{inset:27px;animation:spin 11s linear infinite reverse}@keyframes spin{to{transform:rotate(360deg)}}#mic{z-index:2;width:88px;height:88px;border-radius:50%;border:1px solid #74f5ff;background:linear-gradient(#0d91a8,#07576a);color:#fff;font-size:2rem;box-shadow:0 0 24px #1be7ff80}.listening #mic{animation:pulse 1s infinite}@keyframes pulse{50%{transform:scale(1.06);box-shadow:0 0 45px #1be7ff}}h1{font-size:1.35rem;margin:14px 0 5px}.hint{color:var(--muted);font-size:.88rem;margin:0 auto;max-width:560px;line-height:1.45}.panel{background:linear-gradient(180deg,#081923e8,#061018ef);border:1px solid #1be7ff2e;border-radius:17px;padding:15px;box-shadow:0 15px 48px #0007;margin-top:13px}.label{font-size:.7rem;text-transform:uppercase;letter-spacing:.14em;color:#77bdcb;margin-bottom:8px}.you{color:#a8cbd2}.zion{color:#f3feff;white-space:pre-wrap}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:13px}.cmd,.btn{border:1px solid #1be7ff33;background:#071923;color:#eaffff;border-radius:13px;padding:12px}.cmd{text-align:left}.cmd strong{display:block;font-size:.86rem}.cmd span{display:block;color:#7faab4;font-size:.74rem;margin-top:3px}.toolbar{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px}.btn.secondary{background:#061018;color:#bad3d9}.progressWrap{margin-top:10px;background:#02090d;border-radius:999px;overflow:hidden;border:1px solid #1be7ff22}.progress{height:7px;width:0;background:linear-gradient(90deg,#0d91a8,#1be7ff);transition:width .2s}.small{font-size:.76rem;color:#82aab3;line-height:1.45}.settings input,.settings select{width:100%;margin-top:6px;padding:11px;border-radius:10px;border:1px solid #1be7ff33;background:#020b10;color:#fff}.notice{border-left:3px solid var(--warn);padding-left:10px}.error{color:#ff9c9c}.ok{color:var(--good)}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+<header><div class="brand">ZION</div><div class="badge" id="status">AGUARDANDO</div></header>
+<section class="hero">
+  <div class="ring"><button id="mic" aria-label="Falar com Zion">🎙️</button></div>
+  <h1 id="greeting">Olá.</h1>
+  <p class="hint">IA local no aparelho. Na primeira configuração, o ZION baixa um modelo de aproximadamente 1 GB. Depois, as respostas da IA são geradas no próprio aparelho.</p>
+</section>
+<section class="panel">
+  <div class="label">Cérebro local</div>
+  <div id="brainState" class="small">Ainda não carregado.</div>
+  <div class="progressWrap"><div id="progress" class="progress"></div></div>
+  <button class="btn" id="loadBrain" style="width:100%;margin-top:10px">Baixar / carregar cérebro local</button>
+</section>
+<section class="panel">
+  <div class="label">Conversa</div>
+  <div class="you" id="heard">Você: —</div><br/>
+  <div class="zion" id="answer">ZION: Pronto para configurar meu cérebro local.</div>
+</section>
+<section class="grid">
+  <button class="cmd" data-cmd="quanto é 18 vezes 7"><strong>Matemática</strong><span>“Quanto é 18 × 7?”</span></button>
+  <button class="cmd" data-cmd="quem foi dom pedro segundo"><strong>História</strong><span>“Quem foi Dom Pedro II?”</span></button>
+  <button class="cmd" data-cmd="anote comprar café"><strong>Notas</strong><span>“Anote comprar café”</span></button>
+  <button class="cmd" data-cmd="abrir mapas"><strong>Mapas</strong><span>“Abrir mapas”</span></button>
+</section>
+<section class="toolbar"><button class="btn" id="installBtn" hidden>Instalar ZION</button><button class="btn secondary" id="stopSpeech">Parar voz</button></section>
+<details class="panel settings"><summary>Configurações</summary>
+  <label class="small">Como o ZION deve chamar você?</label><input id="userName" placeholder="Ex.: Bruno"/>
+  <button class="btn" style="width:100%;margin-top:9px" id="saveName">Salvar nome</button>
+  <p class="small notice">Sem API paga. Sem chave secreta. O modelo é executado localmente com WebGPU. O aparelho precisa ter navegador compatível e memória suficiente.</p>
+</details>
+</div>
+<script type="module">
+import * as webllm from "https://esm.run/@mlc-ai/web-llm";
+const $=s=>document.querySelector(s), app=$('#app'), statusEl=$('#status'), heard=$('#heard'), answer=$('#answer');
+const brainState=$('#brainState'), progress=$('#progress'), loadBrain=$('#loadBrain'), nameInput=$('#userName');
+const MODEL='Llama-3.2-1B-Instruct-q4f16_1-MLC';
+let engine=null, loading=false, deferredPrompt=null;
+let userName=localStorage.getItem('zion_name')||'senhor'; nameInput.value=userName==='senhor'?'':userName;
+function partOfDay(){const h=new Date().getHours();return h<12?'Bom dia':h<18?'Boa tarde':'Boa noite'}
+function greet(){ $('#greeting').textContent=`${partOfDay()}, ${userName}.`; } greet();
+function speak(text){ if(!('speechSynthesis' in window))return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text);u.lang='pt-BR';u.rate=1.01;u.pitch=.94;speechSynthesis.speak(u); }
+function respond(text,voice=true){answer.textContent='ZION: '+text;statusEl.textContent='PRONTO';app.classList.remove('listening');if(voice)speak(text)}
+function notes(){try{return JSON.parse(localStorage.getItem('zion_notes')||'[]')}catch{return[]}}
+function saveNotes(n){localStorage.setItem('zion_notes',JSON.stringify(n))}
+function openMaps(query=''){window.open(query?`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`:'https://www.google.com/maps','_blank')}
+function routeTo(dest){window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(dest)}&travelmode=driving`,'_blank')}
+function calcExpr(t){
+  let s=t.toLowerCase().replace(/quanto é|calcule|calcular|qual é o resultado de/g,'').replace(/vezes|x/g,'*').replace(/dividido por|÷/g,'/').replace(/mais/g,'+').replace(/menos/g,'-').replace(/,/g,'.').trim();
+  if(!/^[0-9+\-*/().\s]+$/.test(s))return null;
+  try{const v=Function('"use strict";return ('+s+')')();return Number.isFinite(v)?v:null}catch{return null}
+}
+async function loadLocalBrain(){
+  if(engine||loading)return; loading=true;statusEl.textContent='CARREGANDO';loadBrain.disabled=true;
+  if(!('gpu' in navigator)){brainState.innerHTML='<span class="error">Este navegador/aparelho não oferece WebGPU. Tente atualizar o Chrome. Se continuar assim, este modo local não será compatível.</span>';statusEl.textContent='INCOMPATÍVEL';loadBrain.disabled=false;loading=false;return}
+  try{
+    engine=await webllm.CreateMLCEngine(MODEL,{initProgressCallback:(r)=>{const p=Math.max(0,Math.min(1,r.progress||0));progress.style.width=(p*100).toFixed(0)+'%';brainState.textContent=r.text||`Carregando ${(p*100).toFixed(0)}%`;}});
+    progress.style.width='100%';brainState.innerHTML='<span class="ok">Cérebro local carregado. Nenhuma API paga está sendo usada.</span>';statusEl.textContent='LOCAL';respond('Meu cérebro local está pronto. Pode perguntar.',true)
+  }catch(e){console.error(e);brainState.innerHTML='<span class="error">Não consegui carregar o modelo. Pode faltar memória, espaço ou compatibilidade com WebGPU.</span>';statusEl.textContent='ERRO';engine=null;loadBrain.disabled=false}finally{loading=false}
+}
+async function askLocalAI(t){
+  if(!engine){respond('Primeiro toque em “Baixar ou carregar cérebro local”.');return}
+  statusEl.textContent='PENSANDO';answer.textContent='ZION: pensando no próprio aparelho…';
+  const memory=notes().slice(0,5).map(x=>x.text).join('; ');
+  const messages=[
+    {role:'system',content:`Você é ZION, um assistente pessoal local em português do Brasil. Seja claro e curto. Responda perguntas simples de história, geografia, ciências, português e matemática. Se não souber, diga que não sabe; não invente. O usuário se chama ${userName}. Notas locais recentes: ${memory||'nenhuma'}.`},
+    {role:'user',content:t}
+  ];
+  try{const out=await engine.chat.completions.create({messages,temperature:.35,max_tokens:220});const text=out.choices?.[0]?.message?.content?.trim()||'Não consegui formular uma resposta.';respond(text)}catch(e){console.error(e);respond('Tive um problema ao responder localmente. Tente novamente.')}
+}
+async function execute(raw){
+  const t=raw.toLowerCase().replace(/^zion[,.]?\s*/,'').trim();heard.textContent='Você: '+raw;if(!t)return respond('Estou ouvindo.');
+  if(/(que horas|hora agora|horas são)/.test(t))return respond(`Agora são ${new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}.`);
+  if(/(que dia|data de hoje|dia é hoje)/.test(t))return respond(`Hoje é ${new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})}.`);
+  const c=calcExpr(t);if(c!==null)return respond(`O resultado é ${String(c).replace('.',',')}.`);
+  if(t.startsWith('anote ')||t.startsWith('anotar ')){const note=t.replace(/^anot(e|ar)\s+/,'').trim();const n=notes();n.unshift({text:note,at:Date.now()});saveNotes(n);return respond(`Anotado: ${note}.`)}
+  if(/mostrar notas|minhas notas|ler notas/.test(t)){const n=notes();return respond(n.length?`${n.slice(0,5).map((x,i)=>`${i+1}: ${x.text}`).join('. ')}`:'Você ainda não tem notas salvas.')}
+  if(/limpar notas|apagar notas/.test(t)){saveNotes([]);return respond('Notas apagadas.')}
+  if(/abrir whatsapp/.test(t)){respond('Abrindo o WhatsApp.');setTimeout(()=>location.href='https://wa.me/',400);return}
+  if(/abrir mapas|abrir mapa/.test(t)){respond('Abrindo o Maps.');setTimeout(()=>openMaps(),400);return}
+  let m=t.match(/(?:me leve para|me leva para|rota para|ir para)\s+(.+)/);if(m){respond(`Abrindo a rota para ${m[1]}.`);setTimeout(()=>routeTo(m[1]),500);return}
+  m=t.match(/(?:buscar|procurar|onde fica)\s+(.+)/);if(m){respond(`Procurando ${m[1]} no mapa.`);setTimeout(()=>openMaps(m[1]),500);return}
+  if(/quem é você|como você se chama/.test(t))return respond('Eu sou ZION, seu assistente pessoal local. Minha inteligência roda no seu próprio aparelho.')
+  return askLocalAI(t)
+}
+loadBrain.onclick=loadLocalBrain;
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let recognition=null;
+if(SR){recognition=new SR();recognition.lang='pt-BR';recognition.interimResults=false;recognition.continuous=false;recognition.onstart=()=>{statusEl.textContent='OUVINDO';app.classList.add('listening')};recognition.onresult=e=>execute(e.results[0][0].transcript);recognition.onerror=e=>respond(e.error==='not-allowed'?'Preciso da permissão do microfone.':'Não consegui entender. Tente novamente.');recognition.onend=()=>app.classList.remove('listening')}
+$('#mic').onclick=()=>{if(!recognition)return respond('O reconhecimento de voz não está disponível neste navegador. Você ainda pode usar os botões.');recognition.start()};
+document.querySelectorAll('[data-cmd]').forEach(b=>b.onclick=()=>execute(b.dataset.cmd));
+$('#stopSpeech').onclick=()=>speechSynthesis.cancel();
+$('#saveName').onclick=()=>{userName=nameInput.value.trim()||'senhor';localStorage.setItem('zion_name',userName);greet();respond(`Certo. Vou chamar você de ${userName}.`)};
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;$('#installBtn').hidden=false});
+$('#installBtn').onclick=async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;$('#installBtn').hidden=true};
+if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js');
+</script>
+</body></html>
